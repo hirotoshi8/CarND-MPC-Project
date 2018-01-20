@@ -22,29 +22,29 @@ The state vector of vehicle model have 4 elements( x-position, y-position, orien
 
 |state vector| Description|
 |-----------|----------|
-|$x$        |x-position|
-|$y$        |y-position|
-|$\psi$     |orientation|
-|$v$        |sppeed|
-|$cte$      |cross-track-error|
-|$e\psi$    |orientation-error|
+|x        |x-position|
+|y        |y-position|
+|psi     |orientation|
+|v        |sppeed|
+|cte      |cross-track-error|
+|epsi    |orientation-error|
 
 Addition to that, we use 2 input vector as the vehicle controlled.
 
 |input vector| Description|
 |-----------|-----|
-|$\delta$   |control the steering angle|
-|$a$        |control the accelation/brake as throttle|
+|delta   |control the steering angle|
+|a     |control the accelation/brake as throttle|
 
 Based on the above state and input vector, our kinematic model is defined by the following equation.
 This formula predicts the time(t+1) state from time(t).
 
-> $x_{t+1} = x_{t} + v_{t} * cos((psi_{t})*dt$ \
-> $y_{t+1} = y_{t} + v_{t} * sin((psi_{t})*dt$ \
-> $\psi_{t+1} = \psi_{t} + v_{t} / L_f* \delta *dt$ \
-> $v_{t+1} = v_{t} + a_{t} *dt$ \
-> $cte_{t+1} = f(x_{t}) - y_t + (v_{t} sin(e\psi_{t})*dt)$ \
-> $e\psi_{t+1} = \psi_{t} - \psi des_{t} + (v_{t}/L_{t} * \delta_{t} *dt)$
+<li><img src = ./img/formula_1.png width=300></li>
+<li><img src = ./img/formula_2.png width=300></li>
+<li><img src = ./img/formula_3.png width=280></li>
+<li><img src = ./img/formula_4.png width=220></li>
+<li><img src = ./img/formula_5.png width=400></li>
+<li><img src = ./img/formula_6.png width=400></li>
 
 
 # 2. Predicted time lenght and duration
