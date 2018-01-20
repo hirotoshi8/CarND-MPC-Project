@@ -46,6 +46,12 @@ This formula predicts the time(t+1) state from time(t).
 <li><img src = ./img/formula_5.png width=400></li>
 <li><img src = ./img/formula_6.png width=400></li>
 
+#$x_{t+1} = x_{t} + v_{t} * cos((psi_{t})*dt$ \ 
+#$y_{t+1} = y_{t} + v_{t} * sin((psi_{t})*dt$ \ 
+#$\psi_{t+1} = \psi_{t} + v_{t} / L_f* \delta *dt$ \ 
+#$v_{t+1} = v_{t} + a_{t} *dt$ \ 
+#$cte_{t+1} = f(x_{t}) - y_t + (v_{t} sin(e\psi_{t})*dt)$ \ 
+#$e\psi_{t+1} = \psi_{t} - \psi des_{t} + (v_{t}/L_{t} * \delta_{t} *dt)$ 
 
 # 2. Predicted time lenght and duration
 MPC predicts the trajectory and we need to set the predicterd time length determined by N (time steps) and dt (time duration between actuations).
