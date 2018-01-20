@@ -101,25 +101,79 @@ int main() {
           double steer_value;
           double throttle_value;
 
+		  // Transform Grobal to Local coordinate
+		  int pt_size = ptsx.size();
+
+		  Eigen::VectorXd ptsx_local(pt_size);
+		  Eigen::VectorXd ptsy_local(pt_size);
+
+		  for (int i = 0; i < pt_size; i++) {
+			  ptsx_local[i] = (ptsx[i] - px) * cos(psi) + (ptsy[i] - py)*sin(psi);
+			  ptsy_local[i] = (ptsx[i] - px) *-sin(psi) + (ptsy[i] - py)*cos(psi);
+		  }
+
+		  // TODO: fit a polynomial to the above x and y coordinates
+		  // Get coeffients for the expected path
+		  auto coeffs = polyfit(ptsx_local, ptsy_local, 3);
+
+		  // Calculate the cross track error
+		  //double cte = polyeval(coeffs, px) - py;
+		  double cte = polyeval(coeffs,0);
+		  // Calculate the orientation error
+		  //double epsi = psi - atan(coeffs[1]);
+		  double epsi = - atan(coeffs[1]);
+
+		  //Set initial state of vehicle on Local coordinate
+		  Eigen::VectorXd state = Eigen::VectorXd(6);
+		  //state << px, py, psi, v, cte, epsi;
+		  state << 0, 0, 0, v, cte, epsi;
+
+		  // Calculate the control with optimizer
+		  state_vec result = mpc.Solve(state, coeffs);
+
+		  int pred_index = 2;
+		  steer_value    = result.delta.at(pred_index);
+		  throttle_value = result.a.at(pred_index);
+
+		  std::vector<double> vec_x;
+		  std::vector<double> vec_y;
+		  //debug
+		  //std::cout << "---------- " << "End of the process" << " ---------- " << std::endl;
+
           json msgJson;
           // NOTE: Remember to divide by deg2rad(25) before you send the steering value back.
           // Otherwise the values will be in between [-deg2rad(25), deg2rad(25] instead of [-1, 1].
-          msgJson["steering_angle"] = steer_value;
-          msgJson["throttle"] = throttle_value;
+          msgJson["steering_angle"] = -steer_value/deg2rad(25);
+          msgJson["throttle"]       = throttle_value;
 
-          //Display the MPC predicted trajectory 
-          vector<double> mpc_x_vals;
-          vector<double> mpc_y_vals;
+		  //debug
+		  std::cout << "x -----------" << px << std::endl;
+		  std::cout << "y -----------" << py << std::endl;
+		  std::cout << "psi ---------" << psi << std::endl;
+		  std::cout << "v -----------" << v << std::endl;
+		  std::cout << "cte ---------" << cte << std::endl;
+		  std::cout << "epsi --------" << epsi << std::endl;
+		  std::cout << "steer_value -" << steer_value << std::endl;
+		  std::cout << "throttle ----" << throttle_value << std::endl;
 
-          //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
-          // the points in the simulator are connected by a Green line
 
+		  //Display the MPC predicted trajectory 
+		  vector<double> mpc_x_vals = result.x;
+		  vector<double> mpc_y_vals = result.y;
+
+		  //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
+		  // the points in the simulator are connected by a Green line
           msgJson["mpc_x"] = mpc_x_vals;
           msgJson["mpc_y"] = mpc_y_vals;
 
           //Display the waypoints/reference line
-          vector<double> next_x_vals;
+		  vector<double> next_x_vals;
           vector<double> next_y_vals;
+
+		  for (int i = 0; i < ptsx_local.size(); i++) {
+			  next_x_vals.push_back(ptsx_local[i]);
+			  next_y_vals.push_back(ptsy_local[i]);
+		  }
 
           //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
           // the points in the simulator are connected by a Yellow line
